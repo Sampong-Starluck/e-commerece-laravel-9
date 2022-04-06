@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use App\Http\Resources\Product\ProductCollection;
 use App\Http\Resources\Product\ProductResource;
+use GuzzleHttp\Handler\Proxy;
 
 class ProductController extends Controller
 {
@@ -14,9 +16,10 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index() // replace collection with make when use paginate
     {
-        return Product::all();
+        // return Product::all()->paginate(5);
+        return ProductCollection::make(Product::paginate(20));
     }
 
     /**
