@@ -7,7 +7,7 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\Product\ProductCollection;
 use App\Http\Resources\Product\ProductResource;
-use GuzzleHttp\Handler\Proxy;
+// use GuzzleHttp\Handler\Proxy;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends Controller
@@ -58,7 +58,7 @@ class ProductController extends Controller
 
         return response([
             'data' => new ProductResource($product)
-        ], Response::HTTP_CREATED);
+        ], Response::HTTP_CREATED); // 201 Created
     }
 
     /**
@@ -103,6 +103,7 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }
