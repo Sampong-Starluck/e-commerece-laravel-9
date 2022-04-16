@@ -7,8 +7,12 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\Product\ProductCollection;
 use App\Http\Resources\Product\ProductResource;
+// use Illuminate\Http\Response as HttpResponse;
 // use GuzzleHttp\Handler\Proxy;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Exceptions\ProductnotBelongsToUser;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -92,7 +96,19 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        //
+
+        if ($this->ProductUserCheck($product) === false) {
+            throw new ProductnotBelongsToUser;
+        }
+
+        $request['detail'] = $request->decription;
+
+        unset($request['description']);
+        $product->update($request->all());
+
+        return response([
+            'data' => new ProductResource($product)
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -103,7 +119,17 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
+        $this->ProductUserCheck($product);
         $product->delete();
         return response(null, Response::HTTP_NO_CONTENT); // 204 No content
+    }
+
+    public function ProductUserCheck(Product $product)
+    {
+        return (Auth::id() === $product->user_id) ? true : false;
+        // if (Auth::id() !== $product->user_id) {
+        //     throw new ProductnotBelongsToUser;
+        //     return false;
+        // }
     }
 }
